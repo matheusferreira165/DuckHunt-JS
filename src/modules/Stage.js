@@ -7,6 +7,7 @@ import Utils from '../libs/utils';
 import Duck from './Duck';
 import Dog from './Dog';
 import Hud from './Hud';
+import Aim from './Aim';
 
 const MAX_X = 800;
 const MAX_Y = 600;
@@ -60,6 +61,9 @@ class Stage extends Container {
       spritesheet: opts.spritesheet,
       downPoint: DOG_POINTS.DOWN,
       upPoint: DOG_POINTS.UP
+    });
+    this.aim = new Aim({
+      spritesheet: opts.spritesheet
     });
     this.dog.visible = false;
     this.flashScreen = FLASH_SCREEN;
@@ -156,6 +160,7 @@ class Stage extends Container {
     this.addChild(this.dog);
     this.addChild(this.flashScreen);
     this.addChild(this.hud);
+    this.addChild(this.aim);
 
     return this;
   }
@@ -212,6 +217,7 @@ class Stage extends Container {
       this.ducks.push(newDuck);
     }
   }
+
 
   /**
    * shotsFired
