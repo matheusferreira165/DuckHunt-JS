@@ -1,4 +1,4 @@
-import {loader, autoDetectRenderer} from 'pixi.js';
+import {loader, autoDetectRenderer, Point} from 'pixi.js';
 import {remove as _remove} from 'lodash/array';
 import levels from '../data/levels.json';
 import Stage from './Stage';
@@ -252,7 +252,6 @@ class Game {
     this.stage = new Stage({
       spritesheet: this.spritesheet
     });
-
     this.scaleToWindow();
     this.addLinkToLevelCreator();
     this.addPauseLink();
@@ -261,7 +260,6 @@ class Game {
     this.bindEvents();
     this.startLevel();
     this.animate();
-
   }
 
   addFullscreenLink() {
@@ -311,10 +309,16 @@ class Game {
     this.stage.hud.levelCreatorLink = 'level creator (c)';
   }
 
+  moveAim(event) {
+    const points = new Point(event.data.global.x, event.data.global.y);
+    this.stage.aim.move(points.x, points.y);
+  }
+
   bindEvents() {
     window.addEventListener('resize', this.scaleToWindow.bind(this));
 
     this.stage.mousedown = this.stage.touchstart = this.handleClick.bind(this);
+    this.stage.mousemove = this.stage.touchmove = this.moveAim.bind(this);
 
     document.addEventListener('keypress', (event) => {
       event.stopImmediatePropagation();
