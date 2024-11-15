@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ShotGun</title>
+</head>
+<body>
+<p id="orientation">Esperando dados de orientação...</p>
+<p id="socket">Conectando...</p>
+<button onclick="handleOrientationPermission()">Permitir orientação</button>
+
+
+<script>
+
+        const orientationText = document.getElementById('orientation');
+        const socketText = document.getElementById('socket');
+        const socket = new WebSocket('wss://9300-45-177-76-38.ngrok-free.app/ws?id=1');
+
+        socket.addEventListener('open', () => {
+            console.log('Conectado ao servidor WebSocket');
+            socketText.innerText = 'Conectado ao servidor WebSocket';
+        });
+
+        socket.addEventListener('message', (event) => {
+            console.log('Mensagem recebida do servidor:', event.data);
+        });
+
+        async function handleOrientationPermission() {
+            if (DeviceOrientationEvent.requestPermission) {
+                try {
+                    const permissionState = await DeviceOrientationEvent.requestPermission();
+                    if (permissionState === 'granted') {
+                        startListeningToOrientation();
+                    } else {
+                        orientationText.innerText = 'Permissão negada.';
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                // Para navegadores que não precisam de permissão
+                startListeningToOrientation();
+            }
+        }
+
+        function startListeningToOrientation() {
+            window.addEventListener('deviceorientation', function(event) {
+                const x = event.gamma;
+                const y = event.beta;
+                console.log(x, y);
+                const message = JSON.stringify({coordinates: { x: x, y: y }});
+                socket.send(message);
+            });
+        }
+
+        window.addEventListener('load', handleOrientationPermission);
+    </script>
+</body>
+</html>
