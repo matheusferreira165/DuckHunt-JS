@@ -13,7 +13,13 @@ type webSocketHandler struct {
 	mu       sync.Mutex
 }
 
-type message struct {
+type Coordinates struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
+type Message struct {
+	Coordinates Coordinates `json:"coordinates"`
 }
 
 func newWebSocketHandler() *webSocketHandler {
@@ -53,13 +59,15 @@ func (wsh *webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	wsh.addClientToChannel(id, c)
 
 	for {
-		_, message, err := c.ReadMessage()
+		var msg Message
+		err := c.ReadJSON(&msg)
 		if err != nil {
 			log.Printf("Error %s when reading message from client", err)
 			return
 		}
 
-		wsh.broadcastToChannel(id, message)
+		log.Printf("Mensagem recebida: %+v", msg)
+		wsh.broadcastToChannel(id, msg)
 	}
 }
 
@@ -85,12 +93,12 @@ func (wsh *webSocketHandler) removeClientFromChannel(id string, client *websocke
 	}
 }
 
-func (wsh *webSocketHandler) broadcastToChannel(id string, message []byte) {
+func (wsh *webSocketHandler) broadcastToChannel(id string, msg Message) {
 	wsh.mu.Lock()
 	defer wsh.mu.Unlock()
 
 	for client := range wsh.users[id] {
-		err := client.WriteJSON(string(message))
+		err := client.WriteJSON(msg)
 		if err != nil {
 			log.Printf("Erro %s ao enviar mensagem", err)
 			err := client.Close()
