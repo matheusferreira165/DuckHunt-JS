@@ -111,8 +111,14 @@ func (wsh *webSocketHandler) broadcastToChannel(id string, msg Message) {
 }
 
 func main() {
+
 	wsh := newWebSocketHandler()
 	http.Handle("/ws", wsh)
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: nil,
+	}
+
 	log.Print("Iniciando Servidor...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(server.ListenAndServe())
 }
