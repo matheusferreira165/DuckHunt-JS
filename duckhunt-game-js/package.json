@@ -3,12 +3,12 @@
   "version": "3.1.0",
   "description": "Duckhunt implemented in JS",
   "scripts": {
-    "gulp": "../node_modules/.bin/gulp",
-    "lint": "../node_modules/.bin/eslint src/**/*.js",
-    "start": "../node_modules/.bin/webpack-dev-server",
-    "build": "../node_modules/.bin/webpack",
-    "audio": "../node_modules/.bin/gulp audio",
-    "images": "../node_modules/.bin/gulp images",
+    "gulp": "gulp",
+    "lint": "eslint src/**/*.js",
+    "start": "webpack-dev-server",
+    "build": "webpack",
+    "audio": "gulp audio",
+    "images": "gulp images",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -46,6 +46,6 @@
     "script-loader": "^0.7.2",
     "tween.js": "^16.6.0",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^2.9.1"
+    "webpack-dev-server": "^2.11.5"
   }
 }
