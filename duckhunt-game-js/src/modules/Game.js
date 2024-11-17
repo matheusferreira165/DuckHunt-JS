@@ -1,4 +1,4 @@
-import {loader, autoDetectRenderer, Point} from 'pixi.js';
+import {loader, autoDetectRenderer} from 'pixi.js';
 import {remove as _remove} from 'lodash/array';
 import levels from '../data/levels.json';
 import Stage from './Stage';
@@ -309,9 +309,8 @@ class Game {
     this.stage.hud.levelCreatorLink = 'level creator (c)';
   }
 
-  moveAim(event) {
-    const points = new Point(event.data.global.x, event.data.global.y);
-    this.stage.aim.move(points.x, points.y);
+  moveAim(coordinates) {
+    this.stage.aim.move(coordinates.x, coordinates.y);
   }
 
   bindEvents() {
