@@ -20,7 +20,8 @@ class Game {
   /**
    * Game Constructor
    * @param opts
-   * @param {String} opts.spritesheet Path to the spritesheet file that PIXI's loader should load
+   * @param {String} opts.spritesheet The object property to ask PIXI's resource loader for
+   * @param  opts.socket The socket object to use for communication
    * @returns {Game}
    */
   constructor(opts) {
@@ -317,7 +318,8 @@ class Game {
     window.addEventListener('resize', this.scaleToWindow.bind(this));
 
     this.stage.mousedown = this.stage.touchstart = this.handleClick.bind(this);
-    this.stage.mousemove = this.stage.touchmove = this.moveAim.bind(this);
+    this.stage.socket.onCoordinates(this.moveAim.bind(this));
+
 
     document.addEventListener('keypress', (event) => {
       event.stopImmediatePropagation();
