@@ -8,6 +8,7 @@ import Duck from './Duck';
 import Dog from './Dog';
 import Hud from './Hud';
 import Aim from './Aim';
+import Socket from './Socket';
 
 const MAX_X = 800;
 const MAX_Y = 600;
@@ -50,6 +51,7 @@ class Stage extends Container {
    * Container for the game
    * @param opts
    * @param opts.spritesheet - String representing the path to the spritesheet file
+   * @param opts.socket
    */
   constructor(opts) {
     super();
@@ -65,6 +67,7 @@ class Stage extends Container {
     this.aim = new Aim({
       spritesheet: opts.spritesheet
     });
+    this.socket = new Socket();
     this.dog.visible = false;
     this.flashScreen = FLASH_SCREEN;
     this.flashScreen.visible = false;
@@ -162,6 +165,7 @@ class Stage extends Container {
     this.addChild(this.hud);
     this.addChild(this.aim);
 
+    this.socket.connect();
     return this;
   }
 
