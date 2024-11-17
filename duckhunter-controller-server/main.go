@@ -66,7 +66,6 @@ func (wsh *webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Printf("Mensagem recebida: %+v", msg)
 		wsh.broadcastToChannel(id, msg)
 	}
 }
