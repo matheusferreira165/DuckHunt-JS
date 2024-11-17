@@ -14,7 +14,7 @@
 
         const orientationText = document.getElementById('orientation');
         const socketText = document.getElementById('socket');
-        const socket = new WebSocket('wss://9300-45-177-76-38.ngrok-free.app/ws?id=1');
+        const socket = new WebSocket('wss://941b-45-177-76-38.ngrok-free.app/ws?id=1');
 
         socket.addEventListener('open', () => {
             console.log('Conectado ao servidor WebSocket');
@@ -45,7 +45,7 @@
 
         function startListeningToOrientation() {
             window.addEventListener('deviceorientation', function(event) {
-                const x = event.gamma;
+                const x = event.alpha;
                 const y = event.beta;
                 console.log(x, y);
                 const message = JSON.stringify({coordinates: { x: x, y: y }});
