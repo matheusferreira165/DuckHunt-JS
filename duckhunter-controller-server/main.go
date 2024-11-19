@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -19,6 +20,7 @@ type Coordinates struct {
 }
 
 type Message struct {
+	To          string      `json:"to"`
 	Coordinates Coordinates `json:"coordinates"`
 }
 
@@ -59,15 +61,22 @@ func (wsh *webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	wsh.addClientToChannel(id, c)
 
 	for {
-		var msg Message
-		err := c.ReadJSON(&msg)
+		_, rawMessage, err := c.ReadMessage()
 		if err != nil {
-			log.Printf("Error %s when reading message from client", err)
+			log.Printf("Erro ao ler mensagem bruta: %v", err)
 			return
+		}
+
+		var msg Message
+		err = json.Unmarshal(rawMessage, &msg)
+		if err != nil {
+			log.Printf("Erro desserelizar JSON: %v", err)
+			continue
 		}
 
 		wsh.broadcastToChannel(id, msg)
 	}
+
 }
 
 func (wsh *webSocketHandler) addClientToChannel(id string, client *websocket.Conn) {
@@ -96,6 +105,7 @@ func (wsh *webSocketHandler) broadcastToChannel(id string, msg Message) {
 	wsh.mu.Lock()
 	defer wsh.mu.Unlock()
 
+	log.Printf("Mensagem recebida: %v", msg)
 	for client := range wsh.users[id] {
 		err := client.WriteJSON(msg)
 		if err != nil {
