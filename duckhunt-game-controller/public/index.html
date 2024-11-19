@@ -3,57 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <title>ShotGun</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        span {
+            margin: 0;
+            font-weight: 600;
+            font-size: 32px;
+        }
+        p {
+            margin: 0;
+            font-size: 32px;
+        }
+    </style>
 </head>
 <body>
-<p id="orientation">Esperando dados de orientação...</p>
-<p id="socket">Conectando...</p>
-<button onclick="handleOrientationPermission()">Permitir orientação</button>
+<header>
+    <div>
+        <p>Orientacao</p>
+        <span id="orientation">OFF</span>
+    </div>
+    <div>
+        <p>Socket</p>
+        <span id="socket">OFF</span>
+    </div>
 
-
+    <button onclick="handleOrientationPermission()" id="active-orientation">Permitir orientação</button>
+</header>
+<main></main>
 <script>
+    const orientationText = document.getElementById('orientation');
+    const activeOrientationButton = document.getElementById('active-orientation');
+    const socketText = document.getElementById('socket');
+    const socket = new WebSocket('wss://0fb9-45-177-78-167.ngrok-free.app/ws?id=1');
 
-        const orientationText = document.getElementById('orientation');
-        const socketText = document.getElementById('socket');
-        const socket = new WebSocket('wss://941b-45-177-76-38.ngrok-free.app/ws?id=1');
+    socket.addEventListener('open', () => {
+        console.log('Conectado ao servidor WebSocket');
+        socketText.innerText = 'ON';
+    });
 
-        socket.addEventListener('open', () => {
-            console.log('Conectado ao servidor WebSocket');
-            socketText.innerText = 'Conectado ao servidor WebSocket';
-        });
+    socket.addEventListener('message', (event) => {
+        console.log('Mensagem recebida do servidor:', event.data);
+    });
 
-        socket.addEventListener('message', (event) => {
-            console.log('Mensagem recebida do servidor:', event.data);
-        });
-
-        async function handleOrientationPermission() {
-            if (DeviceOrientationEvent.requestPermission) {
-                try {
-                    const permissionState = await DeviceOrientationEvent.requestPermission();
-                    if (permissionState === 'granted') {
-                        startListeningToOrientation();
-                    } else {
-                        orientationText.innerText = 'Permissão negada.';
-                    }
-                } catch (error) {
-                    console.error(error);
+    async function handleOrientationPermission() {
+        if (DeviceOrientationEvent.requestPermission) {
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission();
+                if (permissionState === 'granted') {
+                    startListeningToOrientation();
+                    activeOrientationButton.style.display = 'none';
+                    orientationText.innerText = 'ON';
+                } else {
+                    orientationText.innerText = 'OFF';
                 }
-            } else {
-                // Para navegadores que não precisam de permissão
-                startListeningToOrientation();
+            } catch (error) {
+                console.error(error);
             }
+        } else {
+            startListeningToOrientation();
         }
+    }
 
-        function startListeningToOrientation() {
-            window.addEventListener('deviceorientation', function(event) {
-                const x = event.alpha;
-                const y = event.beta;
-                console.log(x, y);
-                const message = JSON.stringify({coordinates: { x: x, y: y }});
-                socket.send(message);
-            });
-        }
+    function startListeningToOrientation() {
+        window.addEventListener('deviceorientation', sendOrientation);
+    }
 
-        window.addEventListener('load', handleOrientationPermission);
-    </script>
+    function sendOrientation(event) {
+        const alpha = event.alpha;
+        const beta = event.beta;
+        const message = JSON.stringify({
+            to: "location",
+            coordinates: {
+                x: alpha,
+                y: beta
+            }
+        });
+        socket.send(message);
+    }
+
+    function sendShootOrientation(event) {
+        const alpha = event.alpha;
+        const beta = event.beta;
+        const message = JSON.stringify({
+            to: "shoot",
+            coordinates: {
+                x: alpha,
+                y: beta
+            }
+        });
+        socket.send(message);
+        window.removeEventListener('deviceorientation', sendShootOrientation);
+    }
+
+    function handleClick() {
+        const mainElement = document.querySelector('main');
+        mainElement.style.backgroundColor = 'red';
+        let opacity = 1;
+
+        mainElement.removeEventListener('click', handleClick);
+
+        const fadeOut = setInterval(() => {
+            if (opacity <= 0) {
+                clearInterval(fadeOut);
+                mainElement.addEventListener('click', handleClick);
+            } else {
+                opacity -= 0.05;
+                mainElement.style.backgroundColor = `rgba(255, 0, 0, ${opacity})`;
+            }
+        }, 35);
+
+        window.addEventListener('deviceorientation', sendShootOrientation);
+    }
+
+    window.addEventListener('load', handleOrientationPermission);
+    document.querySelector('main').addEventListener('click', handleClick);
+</script>
 </body>
 </html>
