@@ -1,23 +1,33 @@
 class Socket {
   constructor() {
     this.ws = null;
-    this.onCoordinatesReceived = null; // Callback para processar as coordenadas
+    this.onCoordinatesReceived = null;
+    this.onShootReceived = null;
   }
 
   connect() {
     this.ws = new WebSocket('ws://localhost:8080/ws?id=1');
-    console.log('Conectando ao servidor');
+
     this.ws.onopen = () => {
       console.log('Conectado ao servidor');
     };
 
     this.ws.onmessage = (event) => {
-      console.log('Mensagem recebida:', event.data);
       try {
         const data = JSON.parse(event.data);
 
         if (this.onCoordinatesReceived) {
-          this.onCoordinatesReceived(data.coordinates); // Envia as coordenadas para o callback
+          switch (data.to) {
+            case 'location':
+              this.onCoordinatesReceived(data.coordinates);
+              break;
+            case 'shoot':
+              this.onShootReceived(data.coordinates);
+              break;
+            default:
+              break;
+          }
+
         }
       } catch (error) {
         console.error('Erro ao processar mensagem:', error);
@@ -35,6 +45,10 @@ class Socket {
 
   onCoordinates(callback) {
     this.onCoordinatesReceived = callback;
+  }
+
+  onShoot(callback) {
+    this.onShootReceived = callback;
   }
 }
 
