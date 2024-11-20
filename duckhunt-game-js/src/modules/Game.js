@@ -314,12 +314,22 @@ class Game {
     this.stage.aim.move(coordinates.x, coordinates.y);
   }
 
+  shoot(coordinates) {
+    this.stage.aim.move(coordinates.x, coordinates.y);
+    const position = this.stage.aim.getGlobalPosition();
+    this.handleClick({
+      data: {
+        global: position,
+      }
+    });
+  }
+
   bindEvents() {
     window.addEventListener('resize', this.scaleToWindow.bind(this));
 
     this.stage.mousedown = this.stage.touchstart = this.handleClick.bind(this);
     this.stage.socket.onCoordinates(this.moveAim.bind(this));
-
+    this.stage.socket.onShoot(this.shoot.bind(this));
 
     document.addEventListener('keypress', (event) => {
       event.stopImmediatePropagation();
