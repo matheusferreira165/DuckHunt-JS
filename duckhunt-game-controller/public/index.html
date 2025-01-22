@@ -53,7 +53,7 @@
     const orientationText = document.getElementById('orientation');
     const activeOrientationButton = document.getElementById('active-orientation');
     const socketText = document.getElementById('socket');
-    const socket = new WebSocket('wss://0fb9-45-177-78-167.ngrok-free.app/ws?id=1');
+    const socket = new WebSocket('wss://1eb3-177-54-199-92.ngrok-free.app/ws?id=1');
 
     socket.addEventListener('open', () => {
         console.log('Conectado ao servidor WebSocket');
@@ -85,6 +85,15 @@
 
     function startListeningToOrientation() {
         window.addEventListener('deviceorientation', sendOrientation);
+
+        const message = JSON.stringify({
+            to: "start",
+            coordinates: {
+                x: '',
+                y: ''
+            }
+        });
+        socket.send(message);
     }
 
     function sendOrientation(event) {
@@ -126,10 +135,10 @@
                 clearInterval(fadeOut);
                 mainElement.addEventListener('click', handleClick);
             } else {
-                opacity -= 0.05;
+                opacity -= 0.10;
                 mainElement.style.backgroundColor = `rgba(255, 0, 0, ${opacity})`;
             }
-        }, 35);
+        }, 15);
 
         window.addEventListener('deviceorientation', sendShootOrientation);
     }
