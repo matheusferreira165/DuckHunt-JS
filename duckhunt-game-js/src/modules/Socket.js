@@ -3,6 +3,7 @@ class Socket {
     this.ws = null;
     this.onCoordinatesReceived = null;
     this.onShootReceived = null;
+    this.startGameCallback = null;
   }
 
   connect() {
@@ -23,6 +24,9 @@ class Socket {
               break;
             case 'shoot':
               this.onShootReceived(data.coordinates);
+              break;
+            case 'start':
+              this.startGameCallback();
               break;
             default:
               break;
@@ -49,6 +53,10 @@ class Socket {
 
   onShoot(callback) {
     this.onShootReceived = callback;
+  }
+
+  startGame(callback) {
+    this.startGameCallback = callback;
   }
 }
 

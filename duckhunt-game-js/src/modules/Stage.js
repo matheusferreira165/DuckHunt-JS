@@ -33,7 +33,8 @@ const HUD_LOCATIONS = {
   REPLAY_BUTTON: new Point(MAX_X / 2, MAX_Y * 0.56),
   BULLET_STATUS: new Point(10, 10),
   DEAD_DUCK_STATUS: new Point(10, MAX_Y * 0.91),
-  MISSED_DUCK_STATUS: new Point(10, MAX_Y * 0.95)
+  MISSED_DUCK_STATUS: new Point(10, MAX_Y * 0.95),
+  START_GAME_BUTTON: new Point(MAX_X / 2, MAX_Y * 0.5)
 };
 
 const FLASH_MS = 60;
@@ -119,6 +120,10 @@ class Stage extends Container {
 
   static missedDuckStatusBoxLocation() {
     return HUD_LOCATIONS.MISSED_DUCK_STATUS;
+  }
+
+  static startGameButtonLocation() {
+    return HUD_LOCATIONS.START_GAME_BUTTON;
   }
 
   pause() {

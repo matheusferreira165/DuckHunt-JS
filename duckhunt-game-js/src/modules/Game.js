@@ -36,7 +36,6 @@ class Game {
     this.muted = false;
     this.paused = false;
     this.activeSounds = [];
-
     this.waveEnding = false;
     this.quackingSoundId = null;
     this.levels = levels.normal;
@@ -259,7 +258,6 @@ class Game {
     this.addMuteLink();
     this.addFullscreenLink();
     this.bindEvents();
-    this.startLevel();
     this.animate();
   }
 
@@ -311,7 +309,7 @@ class Game {
   }
 
   moveAim(coordinates) {
-    this.stage.aim.move(coordinates.x, coordinates.y);
+    this.stage.aim.move(coordinates.x.toFixed(2), coordinates.y.toFixed(2));
   }
 
   shoot(coordinates) {
@@ -330,6 +328,7 @@ class Game {
     this.stage.mousedown = this.stage.touchstart = this.handleClick.bind(this);
     this.stage.socket.onCoordinates(this.moveAim.bind(this));
     this.stage.socket.onShoot(this.shoot.bind(this));
+    this.stage.socket.startGame(this.startLevel.bind(this));
 
     document.addEventListener('keypress', (event) => {
       event.stopImmediatePropagation();
