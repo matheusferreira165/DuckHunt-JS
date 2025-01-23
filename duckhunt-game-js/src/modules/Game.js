@@ -1,10 +1,12 @@
-import {loader, autoDetectRenderer} from 'pixi.js';
+import {loader, autoDetectRenderer, Container} from 'pixi.js';
 import {remove as _remove} from 'lodash/array';
 import levels from '../data/levels.json';
 import Stage from './Stage';
 import sound from './Sound';
 import levelCreator from '../libs/levelCreator.js';
 import utils from '../libs/utils';
+import QRCode from 'qrcode';
+import {Sprite, Texture} from 'pixi.js/lib/core';
 
 const BLUE_SKY_COLOR = 0x64b0ff;
 const PINK_SKY_COLOR = 0xfbb4d4;
@@ -39,6 +41,7 @@ class Game {
     this.waveEnding = false;
     this.quackingSoundId = null;
     this.levels = levels.normal;
+    this.qrSprite = null;
     return this;
   }
 
@@ -252,6 +255,7 @@ class Game {
     this.stage = new Stage({
       spritesheet: this.spritesheet
     });
+    this.renderQRCode();
     this.scaleToWindow();
     this.addLinkToLevelCreator();
     this.addPauseLink();
@@ -322,13 +326,18 @@ class Game {
     });
   }
 
+  handleStartGame() {
+    this.startLevel();
+    this.removeQRCode();
+  }
+
   bindEvents() {
     window.addEventListener('resize', this.scaleToWindow.bind(this));
 
     this.stage.mousedown = this.stage.touchstart = this.handleClick.bind(this);
     this.stage.socket.onCoordinates(this.moveAim.bind(this));
     this.stage.socket.onShoot(this.shoot.bind(this));
-    this.stage.socket.startGame(this.startLevel.bind(this));
+    this.stage.socket.startGame(this.handleStartGame.bind(this));
 
     document.addEventListener('keypress', (event) => {
       event.stopImmediatePropagation();
@@ -620,6 +629,43 @@ class Game {
 
     requestAnimationFrame(this.animate.bind(this));
   }
+
+  generateQRCode(data) {
+    const canvas = document.createElement('canvas');
+    return QRCode.toCanvas(canvas, data, { width: 200, margin: 1 })
+      .then(() => Texture.from(canvas))
+      .catch((err) => {
+        console.error('Erro ao gerar QR Code:', err);
+      });
+  }
+
+
+  renderQRCode() {
+    const qrData = 'https://10.0.0.169:3000/';
+    this.generateQRCode(qrData).then((qrTexture) => {
+      if (!qrTexture) return;
+
+      if (this.qrSprite) {
+        this.removeQRCode();
+      }
+
+      this.qrSprite = new Sprite(qrTexture);
+      this.qrSprite.anchor.set(0.5);
+      this.qrSprite.x = 400;
+      this.qrSprite.y = 300;
+      this.stage.addChild(this.qrSprite);
+
+    });
+  }
+
+  removeQRCode() {
+    if (this.qrSprite) {
+      this.stage.removeChild(this.qrSprite);
+      this.qrSprite.destroy();
+      this.qrSprite = null;
+    }
+  }
+
 }
 
 export default Game;
