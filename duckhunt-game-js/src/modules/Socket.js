@@ -17,16 +17,16 @@ class Socket {
       try {
         const data = JSON.parse(event.data);
 
-        if (this.onCoordinatesReceived) {
+        if (data) {
           switch (data.to) {
+            case 'start':
+              this.startGameCallback();
+              break;
             case 'location':
               this.onCoordinatesReceived(data.coordinates);
               break;
             case 'shoot':
               this.onShootReceived(data.coordinates);
-              break;
-            case 'start':
-              this.startGameCallback();
               break;
             default:
               break;
