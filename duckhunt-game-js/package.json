@@ -47,5 +47,8 @@
     "tween.js": "^16.6.0",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.11.5"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
   }
 }
