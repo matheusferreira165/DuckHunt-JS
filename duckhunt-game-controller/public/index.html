@@ -48,12 +48,14 @@
 
     <button onclick="handleOrientationPermission()" id="active-orientation">Permitir orientação</button>
 </header>
-<main></main>
+<main>
+    <button onclick="handleStartGame()" style="width: 100px; height: 200px ">Iniciar jogo</button>
+</main>
 <script>
     const orientationText = document.getElementById('orientation');
     const activeOrientationButton = document.getElementById('active-orientation');
     const socketText = document.getElementById('socket');
-    const socket = new WebSocket('wss://1eb3-177-54-199-92.ngrok-free.app/ws?id=1');
+    const socket = new WebSocket('wss://c511-177-54-199-92.ngrok-free.app/ws?id=1');
 
     socket.addEventListener('open', () => {
         console.log('Conectado ao servidor WebSocket');
@@ -85,15 +87,6 @@
 
     function startListeningToOrientation() {
         window.addEventListener('deviceorientation', sendOrientation);
-
-        const message = JSON.stringify({
-            to: "start",
-            coordinates: {
-                x: '',
-                y: ''
-            }
-        });
-        socket.send(message);
     }
 
     function sendOrientation(event) {
@@ -123,6 +116,17 @@
         window.removeEventListener('deviceorientation', sendShootOrientation);
     }
 
+    function handleStartGame() {
+        const message = JSON.stringify({
+            to: "start",
+            coordinates: {
+                x: 0.0,
+                y: 0.0
+            }
+        });
+        socket.send(message);
+    }
+
     function handleClick() {
         const mainElement = document.querySelector('main');
         mainElement.style.backgroundColor = 'red';
@@ -144,7 +148,7 @@
     }
 
     window.addEventListener('load', handleOrientationPermission);
-    document.querySelector('main').addEventListener('click', handleClick);
+    document.querySelector('main').addEventListener('click', handleStartGame);
 </script>
 </body>
 </html>
