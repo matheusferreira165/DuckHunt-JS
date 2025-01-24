@@ -9,6 +9,7 @@ import Dog from './Dog';
 import Hud from './Hud';
 import Aim from './Aim';
 import Socket from './Socket';
+import shortid from 'shortid';
 
 const MAX_X = 800;
 const MAX_Y = 600;
@@ -73,7 +74,7 @@ class Stage extends Container {
     this.flashScreen = FLASH_SCREEN;
     this.flashScreen.visible = false;
     this.hud = new Hud();
-
+    this.partyId = null;
     this._setStage();
     this.scaleToWindow();
   }
@@ -163,6 +164,8 @@ class Stage extends Container {
     const tree = new extras.AnimatedSprite([loader.resources[this.spritesheet].textures['scene/tree/0.png']]);
     tree.position.set(100, 237);
 
+    const partyId = this.generatePartyId();
+
     this.addChild(tree);
     this.addChild(background);
     this.addChild(this.dog);
@@ -170,7 +173,7 @@ class Stage extends Container {
     this.addChild(this.hud);
     this.addChild(this.aim);
 
-    this.socket.connect();
+    this.socket.connect(partyId);
     return this;
   }
 
@@ -400,6 +403,12 @@ class Stage extends Container {
    */
   isLocked() {
     return this.locked;
+  }
+
+  generatePartyId() {
+    const partyId = shortid.generate();
+    this.partyId = partyId;
+    return partyId;
   }
 }
 

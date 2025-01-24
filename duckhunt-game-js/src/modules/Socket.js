@@ -6,8 +6,8 @@ class Socket {
     this.startGameCallback = null;
   }
 
-  connect() {
-    this.ws = new WebSocket('ws://localhost:8080/ws?id=1');
+  connect(partyId) {
+    this.ws = new WebSocket(`ws://localhost:8080/ws?id=${partyId}`);
 
     this.ws.onopen = () => {
       console.log('Conectado ao servidor');
