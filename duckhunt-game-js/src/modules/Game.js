@@ -642,7 +642,7 @@ class Game {
 
 
   renderQRCode() {
-    const qrData = `https://${CONTROLLER_ENDPOINT}?party=${this.stage.partyId}`;
+    const qrData = `${CONTROLLER_ENDPOINT}?party=${this.stage.partyId}`;
     this.generateQRCode(qrData).then((qrTexture) => {
       if (!qrTexture) return;
 
