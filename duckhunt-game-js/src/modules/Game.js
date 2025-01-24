@@ -1,4 +1,4 @@
-import {loader, autoDetectRenderer, Container} from 'pixi.js';
+import {loader, autoDetectRenderer} from 'pixi.js';
 import {remove as _remove} from 'lodash/array';
 import levels from '../data/levels.json';
 import Stage from './Stage';
@@ -17,6 +17,7 @@ const BOTTOM_LINK_STYLE = {
   align: 'left',
   fill: 'white'
 };
+const CONTROLLER_ENDPOINT = 'https://10.0.0.169:3000';
 
 class Game {
   /**
@@ -641,7 +642,7 @@ class Game {
 
 
   renderQRCode() {
-    const qrData = 'https://10.0.0.169:3000/';
+    const qrData = `https://${CONTROLLER_ENDPOINT}?party=${this.stage.partyId}`;
     this.generateQRCode(qrData).then((qrTexture) => {
       if (!qrTexture) return;
 
