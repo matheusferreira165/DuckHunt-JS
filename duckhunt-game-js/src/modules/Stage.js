@@ -14,6 +14,10 @@ import shortid from 'shortid';
 const MAX_X = 800;
 const MAX_Y = 600;
 
+const QR_CODE_LOCATION = {
+  QR_CODE : new Point(MAX_X / 2, MAX_Y / 2),
+  MESSAGE: new Point(MAX_X / 2, MAX_Y / 2 + 300)
+};
 const DUCK_POINTS = {
   ORIGIN: new Point(MAX_X / 2, MAX_Y)
 };
@@ -77,6 +81,14 @@ class Stage extends Container {
     this.partyId = null;
     this._setStage();
     this.scaleToWindow();
+  }
+
+  static qrCodeLocation() {
+    return QR_CODE_LOCATION.QR_CODE;
+  }
+
+  static scanQrCodeMessageLocation() {
+    return QR_CODE_LOCATION.MESSAGE;
   }
 
   static scoreBoxLocation() {
