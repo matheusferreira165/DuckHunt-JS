@@ -1,4 +1,4 @@
-import {loader, autoDetectRenderer} from 'pixi.js';
+import {loader, autoDetectRenderer, Text} from 'pixi.js';
 import {remove as _remove} from 'lodash/array';
 import levels from '../data/levels.json';
 import Stage from './Stage';
@@ -6,7 +6,7 @@ import sound from './Sound';
 import levelCreator from '../libs/levelCreator.js';
 import utils from '../libs/utils';
 import QRCode from 'qrcode';
-import {Sprite, Texture} from 'pixi.js/lib/core';
+import {Sprite, TextStyle, Texture} from 'pixi.js/lib/core';
 
 const BLUE_SKY_COLOR = 0x64b0ff;
 const PINK_SKY_COLOR = 0xfbb4d4;
@@ -15,6 +15,13 @@ const BOTTOM_LINK_STYLE = {
   fontFamily: 'Arial',
   fontSize: '15px',
   align: 'left',
+  fill: 'white'
+};
+
+const MESSAGE_START_STYLE = {
+  fontFamily: 'Arial',
+  fontSize: '20px',
+  align: 'center',
   fill: 'white'
 };
 const CONTROLLER_ENDPOINT = 'https://10.0.0.169:3000';
@@ -43,6 +50,7 @@ class Game {
     this.quackingSoundId = null;
     this.levels = levels.normal;
     this.qrSprite = null;
+    this.qrCodeMessage = null;
     return this;
   }
 
@@ -257,6 +265,7 @@ class Game {
       spritesheet: this.spritesheet
     });
     this.renderQRCode();
+    this.addScanQrCodeMessage();
     this.scaleToWindow();
     this.addLinkToLevelCreator();
     this.addPauseLink();
@@ -301,6 +310,7 @@ class Game {
     this.stage.hud.pauseLink = 'pause (p)';
   }
 
+
   addLinkToLevelCreator() {
     this.stage.hud.createTextBox('levelCreatorLink', {
       style: BOTTOM_LINK_STYLE,
@@ -330,6 +340,7 @@ class Game {
   handleStartGame() {
     this.startLevel();
     this.removeQRCode();
+    this.removeScanQrCodeMessage();
   }
 
   bindEvents() {
@@ -631,6 +642,26 @@ class Game {
     requestAnimationFrame(this.animate.bind(this));
   }
 
+  addScanQrCodeMessage() {
+    const message = new Text('Scan QR para acessar o controle', new TextStyle(MESSAGE_START_STYLE));
+
+    message.anchor.set(0.5, 8);
+    message.position.set(Stage.scanQrCodeMessageLocation().x, Stage.scanQrCodeMessageLocation().y);
+
+    this.stage.addChild(message);
+
+    this.qrCodeMessage = message;
+
+  }
+
+  removeScanQrCodeMessage() {
+    if (this.qrCodeMessage) {
+      this.stage.removeChild(this.qrCodeMessage);
+      this.qrCodeMessage.destroy();
+      this.qrCodeMessage = null;
+    }
+  }
+
   generateQRCode(data) {
     const canvas = document.createElement('canvas');
     return QRCode.toCanvas(canvas, data, { width: 200, margin: 1 })
@@ -639,7 +670,6 @@ class Game {
         console.error('Erro ao gerar QR Code:', err);
       });
   }
-
 
   renderQRCode() {
     const qrData = `${CONTROLLER_ENDPOINT}?party=${this.stage.partyId}`;
@@ -652,8 +682,8 @@ class Game {
 
       this.qrSprite = new Sprite(qrTexture);
       this.qrSprite.anchor.set(0.5);
-      this.qrSprite.x = 400;
-      this.qrSprite.y = 300;
+      this.qrSprite.position.set(Stage.qrCodeLocation().x, Stage.qrCodeLocation().y);
+
       this.stage.addChild(this.qrSprite);
 
     });
