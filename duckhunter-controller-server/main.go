@@ -28,7 +28,18 @@ func newWebSocketHandler() *webSocketHandler {
 	return &webSocketHandler{
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
-				return true
+				allowedOrigins := []string{
+					"https://duckhunt-game-0714c09a9b65.herokuapp.com/",
+					"https://duckhunt-shoot-c0015710905b.herokuapp.com/",
+				}
+
+				origin := r.Header.Get("Origin")
+				for _, allowedOrigin := range allowedOrigins {
+					if origin == allowedOrigin {
+						return true
+					}
+				}
+				return false
 			},
 		},
 		users: make(map[string]map[*websocket.Conn]bool),
