@@ -8,54 +8,123 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background-color: #333;
-            color: #fff;
-        }
-        main {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            height: 100vb;
+            background-color: #1a1a1a;
+            color: #fff;
         }
-        span {
-            margin: 0;
+
+        .container {
+            text-align: center;
+        }
+
+        .button {
+            width: 20rem;
+            height: 20rem;
+            background-color: #4CAF50;
+            border: 5px solid white;
+            color: white;
+            font-size: 48px;
             font-weight: 600;
-            font-size: 32px;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.3s, transform 0.2s;
+            animation: borderBlink 1s infinite alternate;
         }
-        p {
-            margin: 0;
-            font-size: 32px;
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        #startBtn {
+            display: none;
+        }
+
+        #info {
+            display: none;
+            transition: opacity 4s ease-in-out;
+            font-size: 44px;
+            text-align: center;
+        }
+
+        .game-container {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #000;
+        }
+
+        .flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,0,0,1) 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s;
+        }
+
+        #powered {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: #000;
+        }
+
+        @keyframes borderBlink {
+            0% {
+                border-color: white;
+            }
+            100% {
+                border-color: #ff0000;
+            }
         }
     </style>
 </head>
 <body>
-<header>
-    <div>
-        <p>Orientacao</p>
-        <span id="orientation">OFF</span>
-    </div>
-    <div>
-        <p>Socket</p>
-        <span id="socket">OFF</span>
-    </div>
+<div class="container">
+   <button id="orientationBtn" class="button">Permitir Orientação</button>
+    <button id="startBtn" class="button">Iniciar Jogo</button>
+    <img src="https://www.pngkey.com/png/full/159-1598985_duck-hunt-duck-hunt-pixel-art.png" alt="ShotGun" style="width: 350px; margin-top: 50px;">
+</div>
+<div id="gameContainer" class="game-container">
+    <div id="flash" class="flash"></div>
+</div>
 
-    <button onclick="handleOrientationPermission()" id="active-orientation">Permitir orientação</button>
-</header>
-<main>
-    <button onclick="handleStartGame()" style="width: 100px; height: 200px ">Iniciar jogo</button>
-</main>
+<div id="info">
+    <h2>Aponte o celular para a tela e clique para atirar</h2>
+</div>
+
+<div id="powered">
+    <h3>Powered by <a href="https://www.linkedin.com/in/matheus-ferreira-952856234/" target="_blank">Matheus Ferreira</a></h3>
+</div>
+
 <script>
-    const orientationText = document.getElementById('orientation');
-    const activeOrientationButton = document.getElementById('active-orientation');
-    const socketText = document.getElementById('socket');
-    const socket = new WebSocket('wss://c511-177-54-199-92.ngrok-free.app/ws?id=1');
+    const orientationBtn = document.getElementById('orientationBtn');
+    const startBtn = document.getElementById('startBtn');
+    const gameContainer = document.getElementById('gameContainer');
+    const flash = document.getElementById('flash');
+    const info = document.getElementById('info');
+
+    const url = new URL(window.location.href);
+    const partyId = url.searchParams.get('party');
+
+    const socket = new WebSocket(`wss://2c8d-177-54-205-82.ngrok-free.app/ws?id=${partyId}`);
 
     socket.addEventListener('open', () => {
         console.log('Conectado ao servidor WebSocket');
@@ -66,16 +135,22 @@
         console.log('Mensagem recebida do servidor:', event.data);
     });
 
+    orientationBtn.addEventListener('click', handleOrientationPermission);
+    startBtn.addEventListener('click', handleStartGame);
+    gameContainer.addEventListener('click', handleClick);
+
     async function handleOrientationPermission() {
         if (DeviceOrientationEvent.requestPermission) {
             try {
                 const permissionState = await DeviceOrientationEvent.requestPermission();
                 if (permissionState === 'granted') {
+                    orientationBtn.style.display = 'none';
+                    setTimeout(() => {
+                        startBtn.style.display = 'block';
+                    }, 1000);
                     startListeningToOrientation();
-                    activeOrientationButton.style.display = 'none';
-                    orientationText.innerText = 'ON';
                 } else {
-                    orientationText.innerText = 'OFF';
+                    console.error('Permissão negada');
                 }
             } catch (error) {
                 console.error(error);
@@ -83,6 +158,37 @@
         } else {
             startListeningToOrientation();
         }
+    }
+
+    function handleStartGame() {
+        gameContainer.style.display = 'block';
+        info.style.display = 'block';
+        document.querySelector('.container').style.display = 'none';
+
+        setTimeout(() => {
+            info.style.opacity = "0";
+        }, 1000);
+
+        setTimeout(() => {
+            info.style.display = 'none';
+        }, 5000);
+
+        const message = JSON.stringify({
+            to: "start",
+            coordinates: {
+                x: 0.0,
+                y: 0.0
+            }
+        });
+        socket.send(message);
+    }
+
+    function handleClick() {
+        flash.style.opacity = 1;
+        setTimeout(() => {
+            flash.style.opacity = 0;
+        }, 50);
+        window.addEventListener('deviceorientation', sendShootOrientation);
     }
 
     function startListeningToOrientation() {
@@ -116,39 +222,7 @@
         window.removeEventListener('deviceorientation', sendShootOrientation);
     }
 
-    function handleStartGame() {
-        const message = JSON.stringify({
-            to: "start",
-            coordinates: {
-                x: 0.0,
-                y: 0.0
-            }
-        });
-        socket.send(message);
-    }
 
-    function handleClick() {
-        const mainElement = document.querySelector('main');
-        mainElement.style.backgroundColor = 'red';
-        let opacity = 1;
-
-        mainElement.removeEventListener('click', handleClick);
-
-        const fadeOut = setInterval(() => {
-            if (opacity <= 0) {
-                clearInterval(fadeOut);
-                mainElement.addEventListener('click', handleClick);
-            } else {
-                opacity -= 0.10;
-                mainElement.style.backgroundColor = `rgba(255, 0, 0, ${opacity})`;
-            }
-        }, 15);
-
-        window.addEventListener('deviceorientation', sendShootOrientation);
-    }
-
-    window.addEventListener('load', handleOrientationPermission);
-    document.querySelector('main').addEventListener('click', handleStartGame);
 </script>
 </body>
 </html>
