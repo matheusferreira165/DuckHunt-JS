@@ -105,7 +105,6 @@ func (wsh *webSocketHandler) broadcastToChannel(id string, msg Message) {
 	wsh.mu.Lock()
 	defer wsh.mu.Unlock()
 
-	log.Printf("Mensagem recebida: %v", msg)
 	for client := range wsh.users[id] {
 		err := client.WriteJSON(msg)
 		if err != nil {
@@ -128,6 +127,6 @@ func main() {
 		Handler: nil,
 	}
 
-	log.Print("Iniciando Servidor...")
+	log.Print("Servidor Iniciado")
 	log.Fatal(server.ListenAndServe())
 }
