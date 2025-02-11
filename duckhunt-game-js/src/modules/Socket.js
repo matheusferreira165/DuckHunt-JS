@@ -7,7 +7,7 @@ class Socket {
   }
 
   connect(partyId) {
-    this.ws = new WebSocket(`ws://localhost:8080/ws?id=${partyId}`);
+    this.ws = new WebSocket(`wss://link-websocket/ws?id=${partyId}`);
 
     this.ws.onopen = () => {
       console.log('Conectado ao servidor');

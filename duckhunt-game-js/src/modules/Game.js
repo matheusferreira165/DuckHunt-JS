@@ -24,7 +24,7 @@ const MESSAGE_START_STYLE = {
   align: 'center',
   fill: 'white'
 };
-const CONTROLLER_ENDPOINT = 'https://10.0.0.169:3000';
+const CONTROLLER_ENDPOINT = 'LINK_CONTROLLER';
 
 class Game {
   /**
@@ -51,6 +51,7 @@ class Game {
     this.levels = levels.normal;
     this.qrSprite = null;
     this.qrCodeMessage = null;
+    this.started = false;
     return this;
   }
 
@@ -264,8 +265,11 @@ class Game {
     this.stage = new Stage({
       spritesheet: this.spritesheet
     });
-    this.renderQRCode();
-    this.addScanQrCodeMessage();
+
+    if (!this.started) {
+      this.renderQRCode();
+      this.addScanQrCodeMessage();
+    }
     this.scaleToWindow();
     this.addLinkToLevelCreator();
     this.addPauseLink();

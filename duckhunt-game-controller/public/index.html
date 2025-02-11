@@ -124,7 +124,7 @@
     const url = new URL(window.location.href);
     const partyId = url.searchParams.get('party');
 
-    const socket = new WebSocket(`wss://2c8d-177-54-205-82.ngrok-free.app/ws?id=${partyId}`);
+    const socket = new WebSocket(`wss://link_websocket/ws?id=${partyId}`);
 
     socket.addEventListener('open', () => {
         console.log('Conectado ao servidor WebSocket');
@@ -156,6 +156,10 @@
                 console.error(error);
             }
         } else {
+            orientationBtn.style.display = 'none';
+            setTimeout(() => {
+                startBtn.style.display = 'block';
+            }, 1000);
             startListeningToOrientation();
         }
     }
