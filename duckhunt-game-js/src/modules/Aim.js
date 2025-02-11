@@ -24,6 +24,10 @@ class Aim extends Character{
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
+    const lerp = (start, end, factor) => start + (end - start) * factor;
+
+    const smoothingFactor = 0.1;
+
     const centerX = windowWidth / 2;
     const centerY = windowHeight / 2;
     const amplitude = 2000;
@@ -38,7 +42,8 @@ class Aim extends Character{
 
     const localPosition = this.parent.toLocal({x: coord.x, y: coord.y});
 
-    this.position.set(localPosition.x, localPosition.y);
+    this.position.x = lerp(this.position.x, localPosition.x, smoothingFactor);
+    this.position.y = lerp(this.position.y, localPosition.y, smoothingFactor);
   }
 
 }
